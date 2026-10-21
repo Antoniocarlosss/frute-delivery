@@ -1,10 +1,10 @@
-import {setores,areaDoSetor,resumoEntrega,normalizar} from './setores.js';
-import {dinheiro} from './produtos.js';
+import {setores,areaDoSetor,resumoEntrega,normalizar,rotuloSetor} from './setores.js?v=6';
+import {dinheiro} from './produtos.js?v=6';
 export function instalarEndereco(form,settings,subtotal){
  const old=form.elements.bairro,street=form.elements.rua,cep=form.elements.cep,city=form.elements.cidade,num=form.elements.numero;
  const select=document.createElement('select');select.name='bairro';select.required=true;
  const label=old.closest('label');const current=old.value;label.firstChild.textContent='Setor de entrega';
- select.add(new Option('Selecione seu setor',''));for(const s of setores)select.add(new Option(s,s));if(current&&!setores.includes(current))select.add(new Option(current,current));select.value=current;old.replaceWith(select);
+ select.add(new Option('Selecione o setor e veja a entrega',''));for(const s of setores){const option=new Option(rotuloSetor(settings,s),s);option.disabled=areaDoSetor(settings,s)?.ativo===false;select.add(option)}if(current&&!setores.includes(current))select.add(new Option(current,current));select.value=current;old.replaceWith(select);
  city.value='Jaru';city.readOnly=true;num.inputMode='numeric';num.autocomplete='address-line2';num.placeholder='Digite o número da casa';
  cep.inputMode='numeric';cep.autocomplete='postal-code';cep.maxLength=9;cep.pattern='[0-9]{5}-?[0-9]{3}';cep.placeholder='00000-000';street.autocomplete='off';street.placeholder='Digite a rua ou avenida';
  const quote=document.createElement('div');quote.className='notice';quote.setAttribute('role','status');label.after(quote);

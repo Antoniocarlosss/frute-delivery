@@ -1,9 +1,9 @@
-import {instalarEndereco} from './endereco.js';
-import {resumoEntrega} from './setores.js';
-import {produtos,dinheiro as money} from './produtos.js';
-import {firebaseConfigured} from './firebase-config.js';
-import {connect} from './firebase-client.js';
-import {validProduct,escapeHtml,safeImage,cleanCart,deliveryQuote} from './catalogo-dados.js';
+import {instalarEndereco} from './endereco.js?v=6';
+import {resumoEntrega} from './setores.js?v=6';
+import {produtos,dinheiro as money} from './produtos.js?v=6';
+import {firebaseConfigured} from './firebase-config.js?v=6';
+import {connect} from './firebase-client.js?v=6';
+import {validProduct,escapeHtml,safeImage,cleanCart,deliveryQuote} from './catalogo-dados.js?v=6';
 const app=document.querySelector('#app');
 let settings=null,ready=!firebaseConfigured;
 async function loadCatalog(){
