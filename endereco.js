@@ -1,5 +1,5 @@
-import {setores,areaDoSetor,resumoEntrega,normalizar,rotuloSetor} from './setores.js?v=7';
-import {dinheiro} from './produtos.js?v=7';
+import {setores,areaDoSetor,resumoEntrega,normalizar,rotuloSetor} from './setores.js?v=8';
+import {dinheiro} from './produtos.js?v=8';
 export function instalarEndereco(form,settings,subtotal){
  const old=form.elements.bairro,street=form.elements.rua,city=form.elements.cidade,num=form.elements.numero;
  const select=document.createElement('select');select.name='bairro';select.required=true;
@@ -10,9 +10,9 @@ export function instalarEndereco(form,settings,subtotal){
  const quote=document.createElement('div');quote.className='notice';quote.setAttribute('role','status');label.after(quote);
  function update(){const q=resumoEntrega(settings,select.value,subtotal);quote.textContent=q.error??`Entrega: ${dinheiro(q.taxa)} • Total estimado: ${dinheiro(q.total)} • ${q.prazo}`}
  const suggestions=document.createElement('div');suggestions.className='street-suggestions';street.after(suggestions);
- const status=document.createElement('p');status.className='muted';status.setAttribute('role','status');street.closest('label').after(status);
+ const status=document.createElement('p');status.className='muted';status.setAttribute('role','status');street.closest('label').append(status);
  let timer,revision=0,controller;
- const message='Se não encontrar, mantenha a rua digitada. O setor deve ser confirmado por você.';
+ const message='';
  const apply=item=>{revision++;controller?.abort();street.value=item.logradouro;suggestions.replaceChildren();status.textContent='Rua preenchida. Confira o setor e o número da casa.'};
  function show(items){suggestions.replaceChildren();for(const item of items.slice(0,10)){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=`${item.logradouro}${item.bairro?' • '+item.bairro:''}`;b.onclick=()=>apply(item);suggestions.append(b)}}
  select.onchange=()=>{revision++;controller?.abort();suggestions.replaceChildren();update();if(street.value.length>=3)search()};
