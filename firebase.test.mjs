@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {validProduct,escapeHtml,safeImage,cleanCart,deliveryQuote} from './catalogo-dados.js';
+const p={id:'ninho',nome:'Ninho',descricao:'Frutas',categoria:'Cremes',imagem:'creme-ninho.png',ativo:true,precos:{400:2500,500:3000}};
+test('validação de catálogo rejeita preço inválido e ID inseguro',()=>{assert.equal(validProduct(p),true);assert.equal(validProduct({...p,precos:{400:-1,500:3000}}),false);assert.equal(validProduct({...p,id:'<script>'}),false);assert.equal(validProduct({...p,imagem:'javascript:alert(1)'}),false)});
+test('textos e fotos não injetam HTML',()=>{assert.equal(escapeHtml('<img onerror="x">'),'&lt;img onerror=&quot;x&quot;&gt;');assert.equal(safeImage('javascript:alert(1)'),'');assert.equal(safeImage('https://example.com/image.png'),'https://example.com/image.png')});
+test('produtos indisponíveis e quantidades inválidas saem do carrinho',()=>{const cart=[{id:'ninho',size:'400',qty:2},{id:'nao-existe',size:'400',qty:1},{id:'ninho',size:'400',qty:-1}];assert.equal(cleanCart(cart,[p]).length,1);assert.equal(cleanCart(cart,[{...p,ativo:false}]).length,0)});
+test('entrega diferencia cidade, respeita mínimo e soma em centavos',()=>{const s={aberta:true,areas:[{cidade:'Ji-Paraná',bairro:'Centro',taxa:500,minimo:2000,prazo:'40 min'}]};assert.equal(deliveryQuote(s,{cidade:'ji-parana',bairro:'centro'},7800).total,8300);assert.ok(deliveryQuote(s,{cidade:'Outra',bairro:'Centro'},7800).error);assert.ok(deliveryQuote(s,{cidade:'Ji-Paraná',bairro:'Centro'},1000).error);assert.ok(deliveryQuote({...s,aberta:false},{},7800).error)});
+test('SDK mantém caminho oficial após retirar subpastas',async()=>{const src=await readFile(new URL('./firebase-client.js',import.meta.url),'utf8');assert.match(src,/www\.gstatic\.com\/firebasejs\/13\.0\.0\//)});
