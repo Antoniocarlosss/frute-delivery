@@ -12,7 +12,7 @@ service cloud.firestore {
     && request.resource.data.nome is string && request.resource.data.nome.size() > 0 && request.resource.data.nome.size() <= 100
     && request.resource.data.descricao is string && request.resource.data.descricao.size() <= 1000
     && request.resource.data.categoria is string && request.resource.data.categoria.size() > 0 && request.resource.data.categoria.size() <= 100
-    && request.resource.data.imagem is string && request.resource.data.imagem.size() <= 2000
+    && request.resource.data.imagem is string && request.resource.data.imagem.size() <= 160000
     && request.resource.data.ativo is bool
     && request.resource.data.precos.keys().hasOnly(['400','500'])
     && request.resource.data.precos['400'] is int && request.resource.data.precos['400'] > 0 && request.resource.data.precos['400'] <= 1000000

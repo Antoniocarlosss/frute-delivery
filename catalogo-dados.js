@@ -1,6 +1,8 @@
 export const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function safeImage(value){
  if(!value)return '';
+ if(typeof value!=='string')return '';
+ if(value.length<=160000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(value))return value;
  if(/^[a-zA-Z0-9_-]+\.(png|jpe?g|webp)$/i.test(value))return value;
  try{const url=new URL(value);return url.protocol==='https:'?url.href:''}catch{return ''}
 }

@@ -1,4 +1,4 @@
-const CACHE='frute-static-firebase-v3';
+const CACHE='frute-static-fotos-v4';
 const FILES=['./','./index.html','./style.css','./app.js','./firebase-client.js','./firebase-config.js','./catalogo-dados.js','./produtos.js','./manifest.json','./icon.svg','./creme-ninho.png','./creme-maracuja.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('frute-static-')&&k!==CACHE).map(k=>caches.delete(k))))));
