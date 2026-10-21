@@ -1,0 +1,4 @@
+export const setores=[...Array.from({length:8},(_,i)=>`Setor ${i+1}`),'Savana Park','Jardim Europa'];
+export const normalizar=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+export function areaDoSetor(settings,setor){return settings?.areas?.find(a=>normalizar(a.cidade)==='jaru'&&normalizar(a.bairro)===normalizar(setor))}
+export function resumoEntrega(settings,setor,subtotal){const a=areaDoSetor(settings,setor);if(!a||!Number.isSafeInteger(a.taxa)||a.taxa<0)return {error:'Taxa deste setor ainda não configurada. Fale com a loja.'};if(a.ativo===false)return {error:'Este setor não está disponível para entrega.'};if(!settings.aberta)return {error:'A loja está fechada.'};if(subtotal<(a.minimo??0))return {error:'O subtotal ainda não atingiu o pedido mínimo deste setor.'};return {taxa:a.taxa,total:subtotal+a.taxa,prazo:a.prazo||'A combinar'}}

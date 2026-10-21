@@ -12,7 +12,7 @@ export function deliveryQuote(settings,profile,subtotal){
  if(!settings||settings.aberta!==true)return {error:'A loja está fechada ou ainda não foi configurada.'};
  const norm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
  const area=settings.areas?.find(a=>norm(a.bairro)===norm(profile.bairro)&&norm(a.cidade)===norm(profile.cidade));
- if(!area)return {error:'Este bairro/cidade não está na lista de entrega. Consulte a loja.'};
+ if(!area||area.ativo===false)return {error:'Este bairro/cidade não está na lista de entrega. Consulte a loja.'};
  if(!Number.isSafeInteger(area.taxa)||area.taxa<0||!Number.isSafeInteger(area.minimo)||area.minimo<0)return {error:'Configuração de entrega inválida. Consulte a loja.'};
  if(subtotal<area.minimo)return {error:`Pedido mínimo para este bairro: ${(area.minimo/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}.`};
  return {taxa:area.taxa,total:subtotal+area.taxa,prazo:String(area.prazo??'A combinar')};
