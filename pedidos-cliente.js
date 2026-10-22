@@ -1,14 +1,15 @@
-import {firebaseConfig} from './firebase-config.js?v=9';
-import {dinheiro} from './produtos.js?v=9';
-import {escapeHtml as esc} from './catalogo-dados.js?v=9';
-import {normalizar} from './setores.js?v=9';
+import {normalizarTelefone} from './telefone.js?v=10';
+import {firebaseConfig} from './firebase-config.js?v=10';
+import {dinheiro} from './produtos.js?v=10';
+import {escapeHtml as esc} from './catalogo-dados.js?v=10';
+import {normalizar} from './setores.js?v=10';
 export const estados={recebido:'Pedido recebido',preparando:'Em preparação',saiu:'Saiu para entrega',entregue:'Entregue',cancelado:'Cancelado'};
 let connection,stop=()=>{};
 export function pararPedidos(){stop();stop=()=>{}}
 async function customer(){return connection??=Promise.all(['app','auth','firestore'].map(s=>import(`https://www.gstatic.com/firebasejs/13.0.0/firebase-${s}.js`))).then(async([A,B,D])=>{const app=A.getApps().find(a=>a.name==='cliente')??A.initializeApp(firebaseConfig,'cliente');const auth=B.getAuth(app);await auth.authStateReady();if(!auth.currentUser)await B.signInAnonymously(auth);return {db:D.getFirestore(app),D,user:auth.currentUser}}).catch(e=>{connection=null;throw e})}
 export async function enviarPedido(cart,profile,expectedTotal){
  if(cart.length<1||cart.length>8)throw Error('Use até 8 linhas de produtos por pedido.');
- if(String(profile.telefone??'').replace(/\D/g,'').length<10||String(profile.telefone).length>30)throw Error('Confira seu WhatsApp com DDD.');
+ const phone=normalizarTelefone(profile.telefone);if(!phone)throw Error('Informe seu WhatsApp com DDD no campo da confirmação.');
  const {D,db,user}=await customer();
  // Mesma tentativa conserva o ID, mesmo se a resposta de rede se perder.
  const fingerprint=JSON.stringify({cart,profile});let pending;
@@ -21,7 +22,7 @@ export async function enviarPedido(cart,profile,expectedTotal){
  const items=await Promise.all(cart.map(async x=>{const p=(await D.getDocFromServer(D.doc(db,'products',x.id))).data();if(!p?.ativo||!p.precos?.[x.size])throw Error('Um produto ficou indisponível. Atualize o cardápio.');return {productId:x.id,nome:p.nome,size:String(x.size),qty:x.qty,unit:p.precos[x.size],note:String(x.note??'').slice(0,300)}}));
  const subtotal=items.reduce((s,x)=>s+x.unit*x.qty,0);if(subtotal<(area.minimo??0))throw Error('Pedido abaixo do mínimo permitido para o setor.');
  if(subtotal+area.taxa!==expectedTotal)throw Error('Os preços ou a entrega mudaram. Atualize a página e revise o total antes de confirmar.');
- const order={customerUid:user.uid,customer:{nome:profile.nome,telefone:profile.telefone,rua:profile.rua,numero:profile.numero,bairro:area.bairro,cidade:area.cidade,complemento:profile.complemento??'',referencia:profile.referencia??''},items,areaIndex,subtotal,delivery:area.taxa,total:subtotal+area.taxa,status:'recebido',payment:'nao_cobrado',createdAt:D.serverTimestamp(),updatedAt:D.serverTimestamp()};
+ const order={customerUid:user.uid,customer:{nome:profile.nome,telefone:phone,rua:profile.rua,numero:profile.numero,bairro:area.bairro,cidade:area.cidade,complemento:profile.complemento??'',referencia:profile.referencia??''},items,areaIndex,subtotal,delivery:area.taxa,total:subtotal+area.taxa,status:'recebido',payment:'nao_cobrado',createdAt:D.serverTimestamp(),updatedAt:D.serverTimestamp()};
  const batch=D.writeBatch(db);batch.set(ref,order);items.forEach((item,index)=>batch.set(D.doc(db,'orders',pending.id,'lines',String(index)),item));await batch.commit();return {id:pending.id,...order};
 }
 export function concluirTentativa(){localStorage.removeItem('frute-pending-order')}
