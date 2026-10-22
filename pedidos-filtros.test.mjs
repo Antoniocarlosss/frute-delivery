@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {filtrarPedidos,contarPedidos} from './pedidos-filtros.js';
+const orders=[{id:'abc123',status:'recebido',customer:{nome:'João Silva',telefone:'69992617094',bairro:'Setor 7'},items:[{nome:'Maracujá'}]},{id:'xyz789',status:'entregue',customer:{nome:'Maria',telefone:'69999999999',bairro:'Setor 1'},items:[]}];
+test('busca ignora acentos e combina com o filtro',()=>{assert.equal(filtrarPedidos(orders,'recebido','joao').length,1);assert.equal(filtrarPedidos(orders,'entregue','joao').length,0);assert.equal(filtrarPedidos(orders,'todos','maracuja').length,1)});
+test('busca por telefone formatado, setor e identificador',()=>{for(const q of ['(69) 99261-7094','Setor 7','ABC123'])assert.equal(filtrarPedidos(orders,'todos',q)[0].id,'abc123')});
+test('contadores incluem todos os estados sem misturar filtros',()=>{assert.deepEqual(contarPedidos(orders),{todos:2,recebido:1,preparando:0,saiu:0,entregue:1,cancelado:0});assert.equal(filtrarPedidos(orders,'cancelado','').length,0)});

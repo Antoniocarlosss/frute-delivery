@@ -18,3 +18,5 @@
 /* O atributo hidden deve prevalecer sobre os estilos de botões e painéis. */
 [hidden]{display:none!important}
 .install-dialog{max-height:88dvh;overflow-y:auto}
+
+.order-tools{display:flex;align-items:end;gap:14px;flex-wrap:wrap}.order-tools label{flex:1;min-width:220px}.order-filters{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.order-filters button{font-size:13px;padding:10px 13px}.order-filters button[aria-pressed=true]{background:#e90060;color:white}.new-order-banner{background:#e8f8ec;border:1px solid #a4d9b4;border-radius:14px;padding:16px;color:#145c30}.new-order-banner button{background:#14763c;font-size:13px}.orders-admin{padding-bottom:24px;border-bottom:1px solid #eddce2;margin-bottom:28px}

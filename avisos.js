@@ -1,5 +1,5 @@
-import {customer,estados} from './pedidos-cliente.js?v=15';
-import {mudancasDeStatus} from './avisos-estado.js?v=15';
+import {customer,estados} from './pedidos-cliente.js?v=16';
+import {mudancasDeStatus} from './avisos-estado.js?v=16';
 let started=false;
 export async function iniciarAvisos(force=false){
  if(started||(!force&&localStorage.getItem('frute-order-alerts')!=='true'))return;started=true;
