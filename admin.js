@@ -1,10 +1,10 @@
-import {painelPedidos} from './pedidos-admin.js?v=10';
-import {configurarEntrega} from './entrega-admin.js?v=10';
-import {firebaseConfigured} from './firebase-config.js?v=10';
-import {connect} from './firebase-client.js?v=10';
-import {produtos} from './produtos.js?v=10';
-import {validProduct} from './catalogo-dados.js?v=10';
-import {prepararFoto} from './foto-produto.js?v=10';
+import {painelPedidos} from './pedidos-admin.js?v=11';
+import {configurarEntrega} from './entrega-admin.js?v=11';
+import {firebaseConfigured} from './firebase-config.js?v=11';
+import {connect} from './firebase-client.js?v=11';
+import {produtos} from './produtos.js?v=11';
+import {validProduct} from './catalogo-dados.js?v=11';
+import {prepararFoto} from './foto-produto.js?v=11';
 const status=document.querySelector('#status'),section=document.querySelector('#admin');
 const say=s=>status.textContent=s;
 function input(form,label,name,value,type='text'){const l=document.createElement('label');l.textContent=label;const i=document.createElement('input');i.name=name;i.type=type;if(type==='checkbox')i.checked=Boolean(value);else i.value=value??'';if(type!=='checkbox'){i.required=true;i.maxLength=1000}l.append(i);form.append(l);return i}
