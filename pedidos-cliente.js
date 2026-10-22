@@ -1,8 +1,8 @@
-import {normalizarTelefone} from './telefone.js?v=12';
-import {firebaseConfig} from './firebase-config.js?v=12';
-import {dinheiro} from './produtos.js?v=12';
-import {escapeHtml as esc} from './catalogo-dados.js?v=12';
-import {normalizar} from './setores.js?v=12';
+import {normalizarTelefone} from './telefone.js?v=13';
+import {firebaseConfig} from './firebase-config.js?v=13';
+import {dinheiro} from './produtos.js?v=13';
+import {escapeHtml as esc} from './catalogo-dados.js?v=13';
+import {normalizar} from './setores.js?v=13';
 export const estados={recebido:'Pedido recebido',preparando:'Em preparação',saiu:'Saiu para entrega',entregue:'Entregue',cancelado:'Cancelado'};
 let connection,stop=()=>{};
 export function pararPedidos(){stop();stop=()=>{}}

@@ -1,4 +1,4 @@
-import {firebaseConfig,firebaseConfigured} from './firebase-config.js?v=12';
+import {firebaseConfig,firebaseConfigured} from './firebase-config.js?v=13';
 let connection;
 export function connect(){
  if(!firebaseConfigured)throw new Error('Firebase não configurado');

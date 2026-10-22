@@ -1,5 +1,5 @@
-import {setores,areaDoSetor,resumoEntrega,normalizar,rotuloSetor} from './setores.js?v=12';
-import {dinheiro} from './produtos.js?v=12';
+import {setores,areaDoSetor,resumoEntrega,normalizar,rotuloSetor} from './setores.js?v=13';
+import {dinheiro} from './produtos.js?v=13';
 export function instalarEndereco(form,settings,subtotal){
  const old=form.elements.bairro,street=form.elements.rua,city=form.elements.cidade,num=form.elements.numero;
  const select=document.createElement('select');select.name='bairro';select.required=true;
