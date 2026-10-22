@@ -20,7 +20,73 @@ service cloud.firestore {
    allow delete: if admin();
   }
   match /publicSettings/store { allow read: if true; allow write: if admin() && request.resource.data.keys().hasOnly(['nome','whatsapp','aberta','areas']) && request.resource.data.nome is string && request.resource.data.nome.size() <= 100 && request.resource.data.whatsapp is string && request.resource.data.whatsapp.matches('[0-9]{10,15}') && request.resource.data.aberta is bool && request.resource.data.areas is list && request.resource.data.areas.size() <= 100; }
-  match /orders/{id} { allow read: if admin() || (request.auth != null && resource.data.customerUid == request.auth.uid); allow write: if false; }
+
+  function validItem(i) {
+   let product = get(/databases/$(database)/documents/products/$(i.productId)).data;
+   return i.keys().hasOnly(['productId','nome','size','qty','unit','note'])
+   && i.productId is string && i.productId.matches('[a-zA-Z0-9_-]{1,80}')
+   && i.size in ['400','500'] && i.qty is int && i.qty > 0 && i.qty <= 99
+   && i.unit is int && i.unit > 0 && i.unit <= 1000000
+   && i.note is string && i.note.size() <= 300
+   && product.ativo == true && i.nome == product.nome && i.unit == product.precos[i.size];
+  }
+  function validCustomer(c) {
+   return c.keys().hasAll(['nome','telefone','rua','numero','bairro','cidade','complemento','referencia'])
+   && c.keys().hasOnly(['nome','telefone','rua','numero','bairro','cidade','complemento','referencia'])
+   && c.nome is string && c.nome.size() > 0 && c.nome.size() <= 150
+   && c.telefone is string && c.telefone.size() >= 10 && c.telefone.size() <= 30
+   && c.rua is string && c.rua.size() > 0 && c.rua.size() <= 150
+   && c.numero is string && c.numero.size() > 0 && c.numero.size() <= 150
+   && c.bairro is string && c.bairro.size() > 0 && c.bairro.size() <= 150
+   && c.cidade is string && c.cidade.size() > 0 && c.cidade.size() <= 150
+   && c.complemento is string && c.complemento.size() <= 150
+   && c.referencia is string && c.referencia.size() <= 150;
+  }
+  function validOrder(o, id) {
+   let store = get(/databases/$(database)/documents/publicSettings/store).data;
+   let area = store.areas[o.areaIndex];
+   return store.aberta == true && o.areaIndex is int && o.areaIndex >= 0 && o.areaIndex < store.areas.size()
+   && area.get('ativo', true) == true && area.taxa is int && area.taxa >= 0
+   && o.customer.bairro == area.bairro && o.customer.cidade == area.cidade
+   && o.delivery == area.taxa && o.subtotal >= area.get('minimo', 0)
+   && o.items is list && o.items.size() >= 1 && o.items.size() <= 8
+   && (o.items.size() <= 0 || getAfter(/databases/$(database)/documents/orders/$(id)/lines/0).data == o.items[0])
+   && (o.items.size() <= 1 || getAfter(/databases/$(database)/documents/orders/$(id)/lines/1).data == o.items[1])
+   && (o.items.size() <= 2 || getAfter(/databases/$(database)/documents/orders/$(id)/lines/2).data == o.items[2])
+   && (o.items.size() <= 3 || getAfter(/databases/$(database)/documents/orders/$(id)/lines/3).data == o.items[3])
+   && (o.items.size() <= 4 || getAfter(/databases/$(database)/documents/orders/$(id)/lines/4).data == o.items[4])
+   && (o.items.size() <= 5 || getAfter(/databases/$(database)/documents/orders/$(id)/lines/5).data == o.items[5])
+   && (o.items.size() <= 6 || getAfter(/databases/$(database)/documents/orders/$(id)/lines/6).data == o.items[6])
+   && (o.items.size() <= 7 || getAfter(/databases/$(database)/documents/orders/$(id)/lines/7).data == o.items[7])
+   && o.subtotal == (o.items.size() > 0 ? o.items[0].unit * o.items[0].qty : 0) + (o.items.size() > 1 ? o.items[1].unit * o.items[1].qty : 0) + (o.items.size() > 2 ? o.items[2].unit * o.items[2].qty : 0) + (o.items.size() > 3 ? o.items[3].unit * o.items[3].qty : 0) + (o.items.size() > 4 ? o.items[4].unit * o.items[4].qty : 0) + (o.items.size() > 5 ? o.items[5].unit * o.items[5].qty : 0) + (o.items.size() > 6 ? o.items[6].unit * o.items[6].qty : 0) + (o.items.size() > 7 ? o.items[7].unit * o.items[7].qty : 0)
+   && o.total == o.subtotal + o.delivery;
+  }
+  match /orders/{id} {
+   allow get, list: if admin() || (request.auth != null && resource.data.customerUid == request.auth.uid);
+   allow create: if request.auth != null && request.auth.token.firebase.sign_in_provider == 'anonymous'
+    && id.matches('[a-f0-9-]{36}')
+    && request.resource.data.keys().hasAll(['customerUid','customer','items','areaIndex','subtotal','delivery','total','status','payment','createdAt','updatedAt'])
+    && request.resource.data.keys().hasOnly(['customerUid','customer','items','areaIndex','subtotal','delivery','total','status','payment','createdAt','updatedAt'])
+    && request.resource.data.customerUid == request.auth.uid
+    && request.resource.data.status == 'recebido' && request.resource.data.payment == 'nao_cobrado'
+    && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time
+    && request.resource.data.subtotal is int && request.resource.data.delivery is int && request.resource.data.total is int
+    && validCustomer(request.resource.data.customer) && validOrder(request.resource.data, id);
+   allow update: if admin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt'])
+    && request.resource.data.updatedAt == request.time
+    && ((resource.data.status == 'recebido' && request.resource.data.status in ['preparando','cancelado'])
+     || (resource.data.status == 'preparando' && request.resource.data.status in ['saiu','cancelado'])
+     || (resource.data.status == 'saiu' && request.resource.data.status in ['entregue','cancelado']));
+   allow delete: if false;
+   match /lines/{index} {
+    allow create: if request.auth != null && index in ['0','1','2','3','4','5','6','7']
+     && !exists(/databases/$(database)/documents/orders/$(id))
+     && getAfter(/databases/$(database)/documents/orders/$(id)).data.customerUid == request.auth.uid
+     && getAfter(/databases/$(database)/documents/orders/$(id)).data.items[int(index)] == request.resource.data
+     && validItem(request.resource.data);
+    allow read, update, delete: if false;
+   }
+  }
   match /{document=**} { allow read, write: if false; }
  }
 }

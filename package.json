@@ -1,1 +1,1 @@
-{"name":"frute-delivery","version":"0.1.1","private":true,"type":"module","scripts":{"test":"node --test catalogo.test.mjs"}}
+{"name":"frute-delivery","version":"0.2.0","private":true,"type":"module","scripts":{"test":"node --test catalogo.test.mjs firebase.test.mjs setores.test.mjs","test:rules":"firebase emulators:exec --only firestore --project demo-frute --config firebase.json \"node regras-pedidos.test.mjs\""},"devDependencies":{"firebase-tools":"13.35.1","@firebase/rules-unit-testing":"4.0.1","firebase":"11.10.0"}}

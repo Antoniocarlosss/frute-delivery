@@ -1,20 +1,21 @@
-import {configurarEntrega} from './entrega-admin.js?v=8';
-import {firebaseConfigured} from './firebase-config.js?v=8';
-import {connect} from './firebase-client.js?v=8';
-import {produtos} from './produtos.js?v=8';
-import {validProduct} from './catalogo-dados.js?v=8';
-import {prepararFoto} from './foto-produto.js?v=8';
+import {painelPedidos} from './pedidos-admin.js?v=9';
+import {configurarEntrega} from './entrega-admin.js?v=9';
+import {firebaseConfigured} from './firebase-config.js?v=9';
+import {connect} from './firebase-client.js?v=9';
+import {produtos} from './produtos.js?v=9';
+import {validProduct} from './catalogo-dados.js?v=9';
+import {prepararFoto} from './foto-produto.js?v=9';
 const status=document.querySelector('#status'),section=document.querySelector('#admin');
 const say=s=>status.textContent=s;
 function input(form,label,name,value,type='text'){const l=document.createElement('label');l.textContent=label;const i=document.createElement('input');i.name=name;i.type=type;if(type==='checkbox')i.checked=Boolean(value);else i.value=value??'';if(type!=='checkbox'){i.required=true;i.maxLength=1000}l.append(i);form.append(l);return i}
 if(!firebaseConfigured)say('Falta a configuração pública do Firebase. Consulte CONFIGURAR-FIREBASE.md.');
 else boot().catch(()=>say('Falha ao conectar ao Firebase. Confira a configuração e a internet.'));
 async function boot(){
- const {auth,db,authApi:A,dbApi:D}=await connect();let stop=()=>{};
+ const {auth,db,authApi:A,dbApi:D}=await connect();let stop=()=>{},stopOrders=()=>{};
  const fail=e=>say(`Não foi possível concluir (${e.code??'erro de conexão'}). Confira permissões e conexão.`);
  document.querySelector('#login').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),b=e.target.querySelector('button');b.disabled=true;try{await A.signInWithEmailAndPassword(auth,f.get('email'),f.get('password'));e.target.reset()}catch{say('Não foi possível entrar. Confira e-mail, senha e conexão.')}finally{b.disabled=false}};
  A.onAuthStateChanged(auth,async user=>{
-  stop();section.hidden=true;document.querySelector('#login').hidden=false;
+  stop();stopOrders();section.hidden=true;document.querySelector('#login').hidden=false;
   if(!user){say('Entre com a conta administrativa autorizada.');return}
   try{
    const permission=await D.getDocFromServer(D.doc(db,'admins',user.uid));
@@ -45,7 +46,7 @@ async function boot(){
    };
    add.onclick=()=>edit(null);
    stop=D.onSnapshot(D.collection(db,'products'),snap=>{list.replaceChildren();snap.forEach(doc=>{const p={...doc.data(),id:doc.id};if(!validProduct(p))return;const card=document.createElement('article');card.className='panel cart-item';const name=document.createElement('h3');name.textContent=p.nome;card.append(name);const text=document.createElement('p');text.textContent=`${p.ativo?'Disponível':'Indisponível'} • 400 ml R$ ${(p.precos[400]/100).toFixed(2)} • 500 ml R$ ${(p.precos[500]/100).toFixed(2)}`;card.append(text);const button=document.createElement('button');button.textContent='Editar';button.onclick=()=>edit(p);card.append(button);const remove=document.createElement('button');remove.className='secondary danger';remove.textContent='Excluir produto';remove.onclick=async()=>{if(!window.confirm('Excluir o produto "'+p.nome+'"? Esta ação não pode ser desfeita.'))return;remove.disabled=true;try{await D.deleteDoc(D.doc(db,'products',p.id));say('Produto excluído. Atualize o cardápio para ver a alteração.')}catch(e){fail(e);remove.disabled=false}};card.append(remove);list.append(card)})},fail);
-   await configurarEntrega(section,D,db,fail,say);say('Acesso autorizado. Catálogo conectado ao Firebase.');
+   stopOrders=painelPedidos(section,D,db,say);await configurarEntrega(section,D,db,fail,say);say('Acesso autorizado. Catálogo conectado ao Firebase.');
   }catch(e){fail(e)}
  });
 }
