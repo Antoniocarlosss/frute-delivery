@@ -1,4 +1,4 @@
-import {setores,areaDoSetor} from './setores.js?v=13';
+import {setores,areaDoSetor} from './setores.js?v=14';
 export async function configurarEntrega(section,D,db,fail,say){
  const snap=await D.getDocFromServer(D.doc(db,'publicSettings','store'));const old=snap.exists()?snap.data():{};
  const title=document.createElement('h2');title.textContent='Loja e entregas em Jaru';section.append(title);const form=document.createElement('form');form.className='panel delivery-form';section.append(form);

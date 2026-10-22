@@ -11,19 +11,19 @@
   "theme_color": "#e90060",
   "icons": [
     {
-      "src": "frute-icon-192.png",
+      "src": "logo-app-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "frute-icon-512.png",
+      "src": "logo-app-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "frute-maskable-512.png",
+      "src": "logo-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
