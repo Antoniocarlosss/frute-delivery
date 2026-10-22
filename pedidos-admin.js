@@ -1,5 +1,5 @@
-import {estados} from './pedidos-cliente.js?v=11';
-import {dinheiro} from './produtos.js?v=11';
+import {estados} from './pedidos-cliente.js?v=12';
+import {dinheiro} from './produtos.js?v=12';
 export function painelPedidos(section,D,db,say){
  const wrapper=document.createElement('section');wrapper.className='orders-admin';section.prepend(wrapper);const h=document.createElement('h2');h.textContent='Pedidos da loja';wrapper.append(h);const note=document.createElement('p');note.textContent='Pedidos recebidos pelo aplicativo. O pagamento não é confirmado aqui. Exibindo os 100 mais recentes.';wrapper.append(note);const list=document.createElement('div');wrapper.append(list);
  const next={recebido:['preparando','cancelado'],preparando:['saiu','cancelado'],saiu:['entregue','cancelado'],entregue:[],cancelado:[]};let known=null;

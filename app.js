@@ -1,12 +1,12 @@
-import {iniciarAvisos} from './avisos.js?v=11';
-import {normalizarTelefone} from './telefone.js?v=11';
-import {enviarPedido,concluirTentativa,mostrarPedidos,pararPedidos} from './pedidos-cliente.js?v=11';
-import {instalarEndereco} from './endereco.js?v=11';
-import {resumoEntrega} from './setores.js?v=11';
-import {produtos,dinheiro as money} from './produtos.js?v=11';
-import {firebaseConfigured} from './firebase-config.js?v=11';
-import {connect} from './firebase-client.js?v=11';
-import {validProduct,escapeHtml,safeImage,cleanCart,deliveryQuote} from './catalogo-dados.js?v=11';
+import {iniciarAvisos} from './avisos.js?v=12';
+import {normalizarTelefone} from './telefone.js?v=12';
+import {enviarPedido,concluirTentativa,mostrarPedidos,pararPedidos} from './pedidos-cliente.js?v=12';
+import {instalarEndereco} from './endereco.js?v=12';
+import {resumoEntrega} from './setores.js?v=12';
+import {produtos,dinheiro as money} from './produtos.js?v=12';
+import {firebaseConfigured} from './firebase-config.js?v=12';
+import {connect} from './firebase-client.js?v=12';
+import {validProduct,escapeHtml,safeImage,cleanCart,deliveryQuote} from './catalogo-dados.js?v=12';
 const app=document.querySelector('#app');
 let settings=null,ready=!firebaseConfigured;
 async function loadCatalog(){
